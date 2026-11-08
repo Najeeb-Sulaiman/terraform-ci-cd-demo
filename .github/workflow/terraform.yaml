@@ -1,0 +1,33 @@
+name: Terraform CI/CD Demo
+run-name: ${{github.actor}} triggered this pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  terraform-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v7
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+      
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform Format
+        rub: terraform fmt
+
+      - name: Terraform Validate
+        rub: terraform Validate
+
+      - name: Terraform Plan
+      - run: terraform plan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
+        run: terraform apply --auto-approve
