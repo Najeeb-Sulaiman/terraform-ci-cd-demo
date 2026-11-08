@@ -20,7 +20,11 @@ jobs:
             echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
             sudo apt update && sudo apt install terraform
       
-
+      - name: Setup AWS CLI
+        run: curl -fsSL https://awscli.amazonaws.com/v2/install.sh | bash
+        env:
+          - AWS_ACCESS_KEY_ID: ${{ AWS_ACCESS_KEY_ID }}
+          - AWS_SECRET_ACCESS_KEY: ${{ AWS_SECRET_ACCESS_KEY }}
       
       - name: Terraform init
         run: terraform init
