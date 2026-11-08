@@ -10,6 +10,9 @@ on:
 jobs:
   terraform-validate:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     steps:
       - name: Checkout code repository
         uses: actions/checkout@v7
@@ -21,10 +24,9 @@ jobs:
             sudo apt update && sudo apt install terraform
       
       - name: Setup AWS CLI
-        run: curl -fsSL https://awscli.amazonaws.com/v2/install.sh | bash
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          curl -fsSL https://awscli.amazonaws.com/v2/install.sh | bash
+          aws --version
       
       - name: Terraform init
         run: terraform init
@@ -34,7 +36,7 @@ jobs:
         continue-on-error: true
 
       - name: Terraform Validate
-        run: terraform Validate
+        run: terraform validate
 
       - name: Terraform Plan
         run: terraform plan
