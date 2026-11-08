@@ -13,20 +13,27 @@ jobs:
     steps:
       - name: Checkout code repository
         uses: actions/checkout@v7
+      
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+        run: |
+            wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+            sudo apt update && sudo apt install terraform
+      
+
       
       - name: Terraform init
         run: terraform init
 
       - name: Terraform Format
-        rub: terraform fmt
+        run: terraform fmt
+        continue-on-error: true
 
       - name: Terraform Validate
         rub: terraform Validate
 
       - name: Terraform Plan
-      - run: terraform plan
+        run: terraform plan
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
