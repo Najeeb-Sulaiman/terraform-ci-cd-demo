@@ -26,7 +26,6 @@ jobs:
       - name: Setup AWS CLI
         run: |
           curl -fsSL https://awscli.amazonaws.com/v2/install.sh | bash
-          aws --version
       
       - name: Terraform init
         run: terraform init
