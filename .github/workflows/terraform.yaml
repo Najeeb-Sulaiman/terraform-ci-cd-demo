@@ -1,4 +1,4 @@
-name: Terraform Workflow Automation CI/CD Demo
+name: Terraform Workflow Automation
 run-name: ${{github.actor}} triggered this pipeline
 
 on:
