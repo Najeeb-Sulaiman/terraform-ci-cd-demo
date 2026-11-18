@@ -1,4 +1,4 @@
-name: Terraform Workflow Automation
+name: Terraform Provisioning Workflow Automation
 run-name: ${{github.actor}} triggered this pipeline
 
 on:
