@@ -4,6 +4,8 @@ run-name: ${{github.actor}} triggered this pipeline
 on:
   push:
     branches: [ main ]
+    paths:
+      - '**.tf'
   pull_request:
     branches: [ main ]
 
