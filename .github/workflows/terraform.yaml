@@ -24,6 +24,12 @@ jobs:
     steps:
       - name: Checkout code repository
         uses: actions/checkout@v7
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Setup Terraform
         run: |
@@ -40,12 +46,6 @@ jobs:
 
       - name: Terraform Validate
         run: terraform validate
-
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v6.3.0
-        with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
 
       - name: Terraform Plan
         run: terraform plan
