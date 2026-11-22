@@ -1,41 +1,55 @@
-# name: Terraform Provisioning Workflow Automation
-# run-name: ${{github.actor}} triggered this pipeline
+name: Terraform Provisioning Workflow Automation
+run-name: ${{github.actor}} triggered this pipeline
 
-# on:
-#   push:
-#     branches: [ main ]
-#   pull_request:
-#     branches: [ main ]
+on:
+  push:
+    paths:
+      - '**.tf'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '**.tf'
 
-# jobs:
-#   terraform:
-#     runs-on: ubuntu-latest
-#     env:
-#       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#     steps:
-#       - name: Checkout code repository
-#         uses: actions/checkout@v7
+env:
+  AWS_ROLE_ARN : "arn:aws:iam::199816166528:role/github-action"
+  AWS_REGION : "eu-west-2"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code repository
+        uses: actions/checkout@v7
       
-#       - name: Setup Terraform
-#         run: |
-#             wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-#             echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-#             sudo apt update && sudo apt install terraform
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6.3.0
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        run: |
+            wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+            sudo apt update && sudo apt install terraform
       
-#       - name: Terraform init
-#         run: terraform init
+      - name: Terraform init
+        run: terraform init
 
-#       - name: Terraform Format
-#         run: terraform fmt
-#         continue-on-error: true
+      - name: Terraform Format
+        run: terraform fmt
+        continue-on-error: true
 
-#       - name: Terraform Validate
-#         run: terraform validate
+      - name: Terraform Validate
+        run: terraform validate
 
-#       - name: Terraform Plan
-#         run: terraform plan
+      - name: Terraform Plan
+        run: terraform plan
 
-#       - name: Terraform Apply
-#         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-#         run: terraform apply --auto-approve
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply --auto-approve
