@@ -8,6 +8,8 @@ on:
       - '**.tf'
   pull_request:
     branches: [ main ]
+    paths:
+      - '**.tf'
 
 env:
   AWS_ROLE_ARN : "arn:aws:iam::199816166528:role/github-action"
